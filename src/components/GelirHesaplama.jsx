@@ -41,16 +41,16 @@ function GelirHesaplama() {
 
     const handleSubmit = () => {
         if (amount) {
-            const income = { id: Math.floor(Math.random() * 10000), amount, category, description };
+            const income = { type: "Gelir", amount, category, description, date: new Date().toLocaleDateString('tr-TR') };
             dispatch(addIncomes(income));
             dispatch(sendToFirestore(income));
             setAmount("");
             setCategory("");
             setDescription("");
 
+
         }
     }
-
 
 
     return (

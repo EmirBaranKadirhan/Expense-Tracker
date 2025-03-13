@@ -12,9 +12,9 @@ export const sendToFirestore = createAsyncThunk('incomes', async (income) => {  
     }
 })
 
-export const sendExpensesToFirestore = createAsyncThunk('expenses', async (expense) => {
+export const sendExpensesToFirestore = createAsyncThunk('expenses', async (expense) => {    // ilk parametre 'expenses' slice'in ismi. Ikinci parametre de GiderHesapla sayfasinda fonksiyona gecilen parametre degeridir
     try {
-        const docRef = await addDoc(collection(db, "transactions"), expense)
+        const docRef = await addDoc(collection(db, "transactions"), expense)    // yukaridaki "expense" parametresi addDoc'a parametre olarak gecer ve firestore'a eklenir. 
         return docRef.id;
     } catch (error) {
         console.log(error.message);

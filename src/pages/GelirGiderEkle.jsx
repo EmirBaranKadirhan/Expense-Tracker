@@ -14,10 +14,17 @@ import GiderHesaplama from '../components/GiderHesaplama';
 
 function GelirGiderEkle() {
     return (
-        <div style={{ display: 'flex', gap: '30px', justifyContent: 'center' }}>
-            <GelirHesaplama />
+        <div style={{ display: 'flex', flexDirection: 'column' }}>
+            <div style={{ marginTop: '150px' }}>
+                <h2 style={{ textAlign: 'center' }}>Gelir Gider Ekle</h2>
+            </div>
 
-            <GiderHesaplama />
+            <div style={{ display: 'flex', gap: '30px', justifyContent: 'center' }}>
+                <GelirHesaplama />
+
+                <GiderHesaplama />
+
+            </div>
 
         </div>
     )

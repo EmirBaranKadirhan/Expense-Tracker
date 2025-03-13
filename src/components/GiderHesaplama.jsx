@@ -47,7 +47,7 @@ function GiderHesaplama() {
 
     const handleSubmit = () => {
         if (amount) {
-            const expensesData = { id: Math.floor(Math.random() * 10000), amount, category, description }
+            const expensesData = { type: "Gider", amount, category, description, date: new Date().toLocaleDateString('tr-TR') }
             dispatch(addExpenses(expensesData));
             dispatch(sendExpensesToFirestore(expensesData));
             setAmount("");
