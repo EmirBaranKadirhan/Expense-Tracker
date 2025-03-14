@@ -1,41 +1,66 @@
 import React, { useEffect, useState } from 'react'
 import { DataGrid, GridToolbar } from '@mui/x-data-grid';
 import Box from '@mui/material/Box';
-import { collection, getDocs, doc, updateDoc, getDoc } from 'firebase/firestore';
+import { collection, getDocs, doc, updateDoc, getDoc, deleteDoc } from 'firebase/firestore';
 import { db } from '../firebase/firebaseConfig'
 import Snackbar from '@mui/material/Snackbar';
 import Alert from '@mui/material/Alert';
+import { MdDelete } from "react-icons/md";
+import { IconButton } from '@mui/material';
 
 
-// Tablolardaki filtreleme mantigi su sekilde, asagidaki field icerisindeki yazili kisim ile data'dan gelen key'ler eslesiyorsa filtreleme gerceklesir, yani field:'type' ve data'dan gelen veri type:'Gelir' buradaki key ==> "type" tir. 
-
-
-
-const columns = [
-    { field: 'type', headerName: 'Tür', width: 200, editable: true },       // editable:true ==> hucrelerin guncellenebilir olmasini saglar
-    { field: 'category', headerName: 'Kategori', width: 200, editable: true },
-    { field: 'amount', headerName: 'Miktar', width: 200, editable: true },
-    { field: 'date', headerName: 'Tarih', width: 200, editable: true },
-    { field: 'description', headerName: 'Açıklama', width: 300, editable: true },
-];
-
-// const rows = [
-//     { id: 1, type: 'Gelir', amount: 1000, date: '2025-07-03', description: 'Maas' },
-//     { id: 2, type: 'Gider', amount: 400, date: '2025-02-02', description: 'Giyim' },
-//     { id: 3, type: 'Gelir', amount: 1850, date: '2025-10-01', description: 'Proje yatirim' },
-//     { id: 4, type: 'Gider', amount: 750, date: '2025-10-05', description: 'Ulasim' },
-//     { id: 5, type: 'Gelir', amount: 1000, date: '2025-06-08', description: 'Maas' },
-//     { id: 6, type: 'Gelir', amount: 4500, date: '2025-04-02', description: 'Satis' },
-//     { id: 7, type: 'Gelir', amount: 400, date: '2025-02-01', description: 'Kiyafet Satis' },
-//     { id: 8, type: 'Gider', amount: 2200, date: '2025-09-05', description: 'Kira' }
-// ]
 
 function TableOfIncomesAndExpenses() {
+
+
+    // Tablolardaki filtreleme mantigi su sekilde, asagidaki field icerisindeki yazili kisim ile data'dan gelen key'ler eslesiyorsa filtreleme gerceklesir, yani field:'type' ve data'dan gelen veri type:'Gelir' buradaki key ==> "type" tir. 
+
+    const columns = [
+        { field: 'type', headerName: 'Tür', width: 200, editable: true },       // editable:true ==> hucrelerin guncellenebilir olmasini saglar
+        { field: 'category', headerName: 'Kategori', width: 200, editable: true },
+        { field: 'amount', headerName: 'Miktar', width: 200, editable: true },
+        { field: 'date', headerName: 'Tarih', width: 200, editable: true },
+        { field: 'description', headerName: 'Açıklama', width: 300, editable: true },
+        {
+            field: 'delete',
+            headerName: 'Silme',
+            width: 150,
+            renderCell: (params) => (           // renderCell ==> Bir fonksiyon olarak tanımlanır ve bu fonksiyon, her bir hücre için çağrılır ayrica hucre ile ilgili bilgileri iceren "params" nesnesi alir. Her bir hucre icin ozel icerik olusturmamizi saglar. Ornegin bir hucrede bir buton, ikon veya React bileseni gostermek istedigimizde kullaniriz.
+                <IconButton color="error" onClick={() => handleDelete(params.id)}>
+                    <MdDelete />
+                </IconButton>
+            )
+
+        }
+    ];
+
+    // const rows = [
+    //     { id: 1, type: 'Gelir', amount: 1000, date: '2025-07-03', description: 'Maas' },
+    //     { id: 2, type: 'Gider', amount: 400, date: '2025-02-02', description: 'Giyim' },
+    //     { id: 3, type: 'Gelir', amount: 1850, date: '2025-10-01', description: 'Proje yatirim' },
+    //     { id: 4, type: 'Gider', amount: 750, date: '2025-10-05', description: 'Ulasim' },
+    //     { id: 5, type: 'Gelir', amount: 1000, date: '2025-06-08', description: 'Maas' },
+    //     { id: 6, type: 'Gelir', amount: 4500, date: '2025-04-02', description: 'Satis' },
+    //     { id: 7, type: 'Gelir', amount: 400, date: '2025-02-01', description: 'Kiyafet Satis' },
+    //     { id: 8, type: 'Gider', amount: 2200, date: '2025-09-05', description: 'Kira' }
+    // ]
 
     const [data, setData] = useState([]);
 
     const [snackbar, setSnackbar] = React.useState(null);
     const handleCloseSnackbar = () => setSnackbar(null);
+
+    const handleDelete = async (id) => {
+        try {
+
+            await deleteDoc(doc(db, 'transactions', id));
+            setData((prevData) => prevData.filter((row) => row.id !== id));
+
+            setSnackbar({ children: 'Row successfully deleted', severity: 'success' })
+        } catch (error) {
+
+        }
+    }
 
     useEffect(() => {
         const fetchData = async () => {
@@ -94,7 +119,10 @@ function TableOfIncomesAndExpenses() {
 
 
                             },
-                        }} />
+
+                        }}
+                    />
+
                     {!!snackbar && (
                         <Snackbar
                             open

@@ -117,7 +117,7 @@ function App() {
             ))}
           </List>
           <Divider />
-          <List>
+          {/* <List>
             {['All mail', 'Trash', 'Spam'].map((text, index) => (
               <ListItem key={text} disablePadding>
                 <ListItemButton>
@@ -128,7 +128,7 @@ function App() {
                 </ListItemButton>
               </ListItem>
             ))}
-          </List>
+          </List> */}
         </Drawer>
       </Box >
     </>

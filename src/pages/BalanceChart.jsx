@@ -4,7 +4,7 @@ import { PieChart } from '@mui/x-charts/PieChart';
 
 function BalanceChart() {
     return (
-        <div style={{ marginTop: '150px' }}>
+        <div style={{ marginTop: '100px' }}>
             <h2>Bilanco Grafigi</h2>
             <PieChart
                 series={[

@@ -15,7 +15,7 @@ import GiderHesaplama from '../components/GiderHesaplama';
 function GelirGiderEkle() {
     return (
         <div style={{ display: 'flex', flexDirection: 'column' }}>
-            <div style={{ marginTop: '150px' }}>
+            <div style={{ marginTop: '100px' }}>
                 <h2 style={{ textAlign: 'center' }}>Gelir Gider Ekle</h2>
             </div>
 
