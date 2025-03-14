@@ -7,7 +7,8 @@ import Snackbar from '@mui/material/Snackbar';
 import Alert from '@mui/material/Alert';
 import { MdDelete } from "react-icons/md";
 import { IconButton } from '@mui/material';
-
+import { useDispatch } from 'react-redux';
+import { deleteFromFirebase } from '../redux/slices/transactionsSlice'
 
 
 function TableOfIncomesAndExpenses() {
@@ -50,10 +51,12 @@ function TableOfIncomesAndExpenses() {
     const [snackbar, setSnackbar] = React.useState(null);
     const handleCloseSnackbar = () => setSnackbar(null);
 
+    const dispatch = useDispatch();
+
     const handleDelete = async (id) => {
         try {
 
-            await deleteDoc(doc(db, 'transactions', id));
+            await dispatch(deleteFromFirebase(id)).unwrap();
             setData((prevData) => prevData.filter((row) => row.id !== id));
 
             setSnackbar({ children: 'Row successfully deleted', severity: 'success' })

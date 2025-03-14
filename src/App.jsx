@@ -37,12 +37,8 @@ function App() {
 
   const theme = useTheme();
 
-  const handleDrawerOpen = () => {                 // drawer kontrolunu burada yaptik
-    setOpen(true);
-  }
-
-  const handleDrawerClose = () => {
-    setOpen(false);
+  const drawerControl = () => {
+    setOpen(!open)
   }
 
   const DrawerHeader = styled('div')(({ theme }) => ({
@@ -69,7 +65,7 @@ function App() {
             <IconButton
               color="inherit"
               aria-label="open drawer"
-              onClick={handleDrawerOpen}
+              onClick={drawerControl}
               edge="start"
               sx={[
                 {
@@ -94,12 +90,13 @@ function App() {
               boxSizing: 'border-box',
             },
           }}
-          variant="persistent"
+          variant="temporary"     // temporary ==> baska yere tikladigimizda drawer'in kapanmasini saglar,  bir de "persistent" olani var o da drawer' i sabit tutuyor.
           anchor="left"
           open={open}
+          onClose={drawerControl}
         >
           <DrawerHeader>
-            <IconButton onClick={handleDrawerClose}>
+            <IconButton onClick={drawerControl}>
               {theme.direction === 'ltr' ? <ChevronLeftIcon /> : <ChevronRightIcon />}
             </IconButton>
           </DrawerHeader>
@@ -117,6 +114,7 @@ function App() {
             ))}
           </List>
           <Divider />
+
           {/* <List>
             {['All mail', 'Trash', 'Spam'].map((text, index) => (
               <ListItem key={text} disablePadding>
@@ -129,6 +127,7 @@ function App() {
               </ListItem>
             ))}
           </List> */}
+
         </Drawer>
       </Box >
     </>

@@ -1,8 +1,8 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
-import { addDoc, collection } from "firebase/firestore";
+import { addDoc, collection, deleteDoc, doc } from "firebase/firestore";
 import { db } from '../../firebase/firebaseConfig';
 
-export const sendToFirestore = createAsyncThunk('incomes', async (income) => {      // ilk parametre olan 'incomes' slice'in ismi'dir. Ikinci parametre de GelirHesapla sayfasinda fonksiyona gecilen parametre'dir.
+export const sendToFirestore = createAsyncThunk('incomes', async (income) => {      // ilk parametre olan 'incomes' slice'in ismi'dir. Ikinci parametre de GelirHesapla sayfasinda fonksiyona gecilen parametre degeridir.
     try {
         const docRef = await addDoc(collection(db, "transactions"), income)     // firestore' a veriler buradan gonderilecek. "transactions" ==> firestore'da bir koleksiyon adini belirtir.
         return docRef.id;
@@ -12,7 +12,7 @@ export const sendToFirestore = createAsyncThunk('incomes', async (income) => {  
     }
 })
 
-export const sendExpensesToFirestore = createAsyncThunk('expenses', async (expense) => {    // ilk parametre 'expenses' slice'in ismi. Ikinci parametre de GiderHesapla sayfasinda fonksiyona gecilen parametre degeridir
+export const sendExpensesToFirestore = createAsyncThunk('expenses', async (expense) => {    // Ikinci parametre GiderHesapla sayfasinda fonksiyona gecilen parametre degeridir
     try {
         const docRef = await addDoc(collection(db, "transactions"), expense)    // yukaridaki "expense" parametresi addDoc'a parametre olarak gecer ve firestore'a eklenir. 
         return docRef.id;
@@ -20,6 +20,18 @@ export const sendExpensesToFirestore = createAsyncThunk('expenses', async (expen
         console.log(error.message);
     }
 })
+
+
+export const deleteFromFirebase = createAsyncThunk('transactions', async (id) => {      //  fonksiyon icindeki ilk parametre adlandirmasini biz istedigimiz gibi verebilirz !! 
+    try {
+        await deleteDoc(doc(db, 'transactions', id));
+        return id;                  // asagida payload durumunda kullanilacak id buradan gelir
+    } catch (error) {
+        console.log(error.message);
+
+    }
+})
+
 
 const initialState = {
     incomes: [],
@@ -48,6 +60,11 @@ export const transactionsSlice = createSlice({
             console.log(`Document expenses added with ID: ${action.payload} `)
         })
 
+        builder.addCase(deleteFromFirebase.fulfilled, (state, action) => {
+            console.log(`Document with ID: ${action.payload}`);
+            state.incomes = state.incomes.filter((income) => income.id !== action.payload);
+            state.expenses = state.expenses.filter((expense) => expense.id !== action.payload);
+        })
     }
 })
 
