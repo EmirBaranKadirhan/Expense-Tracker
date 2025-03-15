@@ -25,9 +25,9 @@ function TableOfIncomesAndExpenses() {
         {
             field: 'delete',
             headerName: 'Silme',
-            width: 150,
+            width: 150,                          // renderCell yerine "getActions" da kullanilabilir !!!
             renderCell: (params) => (           // renderCell ==> Bir fonksiyon olarak tanımlanır ve bu fonksiyon, her bir hücre için çağrılır ayrica hucre ile ilgili bilgileri iceren "params" nesnesi alir. Her bir hucre icin ozel icerik olusturmamizi saglar. Ornegin bir hucrede bir buton, ikon veya React bileseni gostermek istedigimizde kullaniriz.
-                <IconButton color="error" onClick={() => handleDelete(params.id)}>
+                <IconButton color="error" onClick={() => handleDelete(params.id)}>          {/* parametre olan "params" secili hucreye ait bilgileri alir */}
                     <MdDelete />
                 </IconButton>
             )
@@ -57,7 +57,7 @@ function TableOfIncomesAndExpenses() {
         try {
 
             await dispatch(deleteFromFirebase(id)).unwrap();
-            setData((prevData) => prevData.filter((row) => row.id !== id));
+            setData((currentData) => currentData.filter((row) => row.id !== id));
 
             setSnackbar({ children: 'Row successfully deleted', severity: 'success' })
         } catch (error) {
