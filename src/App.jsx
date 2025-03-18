@@ -29,16 +29,22 @@ import { FaChartPie } from "react-icons/fa";
 import { TbTransfer } from "react-icons/tb";
 import { NavLink } from 'react-router-dom';
 import IncomesAndExpenses from './pages/IncomesAndExpenses'
-
+import Login from '../src/pages/Login'
 
 function App() {
 
   const [open, setOpen] = useState(false);
 
+  const [isLoggedIn, isLoggedSetIn] = useState(false);
+
   const theme = useTheme();
 
   const drawerControl = () => {
     setOpen(!open)
+  }
+
+  const handleLogin = () => {
+    isLoggedSetIn(true)
   }
 
   const DrawerHeader = styled('div')(({ theme }) => ({
@@ -56,80 +62,73 @@ function App() {
 
   return (
     <>
-      <RouterConfig />
+      {isLoggedIn ? (
+        <>
+          <RouterConfig />
 
-      <Box sx={{ display: 'flex' }}>
-        <CssBaseline />
-        <AppBar position="fixed" open={open}>
-          <Toolbar>
-            <IconButton
-              color="inherit"
-              aria-label="open drawer"
-              onClick={drawerControl}
-              edge="start"
-              sx={[
-                {
-                  mr: 2,
+          <Box sx={{ display: 'flex' }}>
+            <CssBaseline />
+            <AppBar position="fixed" open={open}>
+              <Toolbar>
+                <IconButton
+                  color="inherit"
+                  aria-label="open drawer"
+                  onClick={drawerControl}
+                  edge="start"
+                  sx={[
+                    {
+                      mr: 2,
+                    },
+                    open && { display: 'none' },
+                  ]}
+                >
+                  <MenuIcon />
+                </IconButton>
+                <Typography variant="h6" noWrap component="div">
+                  Menu
+                </Typography>
+              </Toolbar>
+            </AppBar>
+            <Drawer
+              sx={{
+                width: 250,
+                flexShrink: 0,
+                '& .MuiDrawer-paper': {
+                  width: 250,
+                  boxSizing: 'border-box',
                 },
-                open && { display: 'none' },
-              ]}
+              }}
+              variant="temporary"     // temporary ==> baska yere tikladigimizda drawer'in kapanmasini saglar,  bir de "persistent" olani var o da drawer' i sabit tutuyor.
+              anchor="left"
+              open={open}
+              onClose={drawerControl}
             >
-              <MenuIcon />
-            </IconButton>
-            <Typography variant="h6" noWrap component="div">
-              Menu
-            </Typography>
-          </Toolbar>
-        </AppBar>
-        <Drawer
-          sx={{
-            width: 250,
-            flexShrink: 0,
-            '& .MuiDrawer-paper': {
-              width: 250,
-              boxSizing: 'border-box',
-            },
-          }}
-          variant="temporary"     // temporary ==> baska yere tikladigimizda drawer'in kapanmasini saglar,  bir de "persistent" olani var o da drawer' i sabit tutuyor.
-          anchor="left"
-          open={open}
-          onClose={drawerControl}
-        >
-          <DrawerHeader>
-            <IconButton onClick={drawerControl}>
-              {theme.direction === 'ltr' ? <ChevronLeftIcon /> : <ChevronRightIcon />}
-            </IconButton>
-          </DrawerHeader>
-          <Divider />
-          <List>
-            {['Anasayfa', 'Gelir Gider Ekle', 'Bilanco Grafik', 'Hesap Hareketleri'].map((text, index) => (
-              <ListItem key={text} disablePadding>
-                <ListItemButton component={NavLink} to={paths[index]}>      {/* NavLink tum ozelliklerini buraya vermis olduk */}
-                  <ListItemIcon>
-                    {icons[index]}
-                  </ListItemIcon>
-                  <ListItemText primary={text} />
-                </ListItemButton>
-              </ListItem>
-            ))}
-          </List>
-          <Divider />
+              <DrawerHeader>
+                <IconButton onClick={drawerControl}>
+                  {theme.direction === 'ltr' ? <ChevronLeftIcon /> : <ChevronRightIcon />}
+                </IconButton>
+              </DrawerHeader>
+              <Divider />
+              <List>
+                {['Anasayfa', 'Gelir Gider Ekle', 'Bilanco Grafik', 'Hesap Hareketleri'].map((text, index) => (
+                  <ListItem key={text} disablePadding>
+                    <ListItemButton component={NavLink} to={paths[index]}>      {/* NavLink tum ozelliklerini buraya vermis olduk */}
+                      <ListItemIcon>
+                        {icons[index]}
+                      </ListItemIcon>
+                      <ListItemText primary={text} />
+                    </ListItemButton>
+                  </ListItem>
+                ))}
+              </List>
+              <Divider />
+            </Drawer>
+          </Box >
+        </>
+      ) : (
+        <Login onClick={handleLogin} />
+      )}
 
-          {/* <List>
-            {['All mail', 'Trash', 'Spam'].map((text, index) => (
-              <ListItem key={text} disablePadding>
-                <ListItemButton>
-                  <ListItemIcon>
-                    {index % 2 === 0 ? <InboxIcon /> : <MailIcon />}
-                  </ListItemIcon>
-                  <ListItemText primary={text} />
-                </ListItemButton>
-              </ListItem>
-            ))}
-          </List> */}
-
-        </Drawer>
-      </Box >
     </>
   );
 }

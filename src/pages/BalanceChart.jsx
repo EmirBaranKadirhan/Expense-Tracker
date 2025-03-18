@@ -14,7 +14,7 @@ function BalanceChart() {
         const getDataFromFirebase = async () => {
             try {
                 const querySnapshot = await getDocs(collection(db, 'transactions'))
-                console.log(querySnapshot.docs)
+                // console.log(querySnapshot.docs)
                 const data = querySnapshot.docs.map((doc) => doc.data());
                 console.log(data)
 
@@ -40,7 +40,7 @@ function BalanceChart() {
     const groupAndSumByCategory = (data) => {
         return data.reduce((acc, item) => {
             const category = item.category;             // data'dan gelen kategori turlerini aldi
-            if (!acc[category]) {                       // burada kontrol yapariz ve oncesinde bu kategori yoksa olusturdu ve degerini 0 yaptik
+            if (!acc[category]) {                       // burada kontrol yapariz ve oncesinde bu kategori yoksa olusturulur ve degerini 0 yapariz
                 acc[category] = { category, amount: 0 }
             }
             acc[category].amount += item.amount;        // kategori oncesinde varsa  degerini guncelledi
