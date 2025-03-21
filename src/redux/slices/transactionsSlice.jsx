@@ -2,9 +2,12 @@ import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import { addDoc, collection, deleteDoc, doc } from "firebase/firestore";
 import { db } from '../../firebase/firebaseConfig';
 
-export const sendToFirestore = createAsyncThunk('incomes', async (income) => {      // ilk parametre olan 'incomes' slice'in ismi'dir. Ikinci parametre de GelirHesapla sayfasinda fonksiyona gecilen parametre degeridir.
+export const sendToFirestore = createAsyncThunk('incomes', async ({ userId, income }) => {      // Ikinci parametre birden fazla degerleri "nesne{}"" seklinde alabilir. ilk parametre olan 'incomes' slice'in ismi'dir. Ikinci parametre de GelirHesapla sayfasinda fonksiyona gecilen parametre degeridir.
     try {
-        const docRef = await addDoc(collection(db, "transactions"), income)     // firestore' a veriler buradan gonderilecek. "transactions" ==> firestore'da bir koleksiyon adini belirtir.
+        const userDocRef = doc(db, "users", userId);
+        const incomesCollectionRef = collection(userDocRef, "incomes");
+        const docRef = await addDoc(incomesCollectionRef, income);
+        // const docRef = await addDoc(collection(db, "transactions"), income)     // firestore' a veriler buradan gonderilecek. "transactions" ==> firestore'da bir koleksiyon adini belirtir.
         return docRef.id;
     } catch (error) {
         console.log(error.message);
@@ -12,9 +15,11 @@ export const sendToFirestore = createAsyncThunk('incomes', async (income) => {  
     }
 })
 
-export const sendExpensesToFirestore = createAsyncThunk('expenses', async (expense) => {    // Ikinci parametre GiderHesapla sayfasinda fonksiyona gecilen parametre degeridir
+export const sendExpensesToFirestore = createAsyncThunk('expenses', async ({ userId, expensesData }) => {
     try {
-        const docRef = await addDoc(collection(db, "transactions"), expense)    // yukaridaki "expense" parametresi addDoc'a parametre olarak gecer ve firestore'a eklenir. 
+        const userDocRef = doc(db, "users", userId);      // "users" koleksiyonundaki userId'ye sahip belgeyi hedef aliyoruz ki o belge uzerinde islem yapabilelim ya da referans olusturabilelim o belgeye
+        const expensesCollectionRef = collection(userDocRef, "expense")     // belirli bir "kullanıcı belgesi" altında yer alan "expense alt koleksiyonunu" hedef aliriz ve bu koleksiyonda duzenleme ayrica referans olusturabiliriz  
+        const docRef = await addDoc(expensesCollectionRef, expensesData);       // yukaridaki "expensesData" parametresi addDoc'a parametre olarak gecer ve firestore'a eklenir. 
         return docRef.id;
     } catch (error) {
         console.log(error.message);

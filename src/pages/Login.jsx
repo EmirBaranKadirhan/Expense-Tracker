@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useState } from 'react'
 import Paper from '@mui/material/Paper';
 import Box from '@mui/material/Box';
 import FormControl from '@mui/material/FormControl';
@@ -13,8 +13,39 @@ import LockIcon from '@mui/icons-material/Lock';
 import Divider from '@mui/material/Divider';
 import Button from '@mui/material/Button';
 import ImageIcon from '@mui/icons-material/Image';
+import { signInWithEmailAndPassword, createUserWithEmailAndPassword } from "firebase/auth";
+import { auth, db } from '../firebase/firebaseConfig';
+import { doc, setDoc } from "firebase/firestore";
+
 
 function Login() {
+
+    const [email, setEmail] = useState('');
+    const [password, setPassword] = useState('');
+    const [username, setUsername] = useState('');
+    const [profileImage, setProfileImage] = useState(null);
+
+
+    const handleRegister = async () => {
+        try {
+            const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+            const user = userCredential.user;
+
+
+
+            await setDoc(doc(db, "users", user.uid), {
+                username: username,
+                email: email,
+
+            });
+
+            console.log("Kullanıcı başarıyla kaydedildi:", user);
+        } catch (error) {
+            console.error("Kayıt hatası:", error);
+        }
+    }
+
+
     return (
         <div style={{ display: 'flex', height: '100vh', width: '100%', alignItems: 'center' }}>
             <Box
@@ -38,6 +69,8 @@ function Login() {
                         <TextField
                             label="Kullanici Adi Giriniz"
                             id="filled-start-adornment"
+                            value={username}
+                            onChange={(e) => setUsername(e.target.value)}
                             sx={{ m: 1, width: '100%' }}
                             slotProps={{
                                 input: {
@@ -51,6 +84,8 @@ function Login() {
                         <TextField
                             label="Sifre Giriniz"
                             id="filled-start-adornment"
+                            value={password}
+                            onChange={(e) => setPassword(e.target.value)}
                             sx={{ m: 1, width: '100%' }}
                             slotProps={{
                                 input: {
@@ -65,6 +100,8 @@ function Login() {
                         <TextField
                             label="EMail Adresinizi Giriniz"
                             id="filled-start-adornment"
+                            value={email}
+                            onChange={(e) => setEmail(e.target.value)}
                             sx={{ m: 1, width: '100%' }}
                             slotProps={{
                                 input: {
@@ -74,22 +111,9 @@ function Login() {
                             variant="outlined"
                         />
                     </FormControl>
-                    <FormControl variant="standard" style={{ width: '95%' }}>
-                        <TextField
-                            type='file'                             // resim ya da dosya eklemek icin 
-                            label="Profil Fotografi Ekleyiniz"
-                            id="filled-start-adornment"
-                            sx={{ m: 1, width: '100%' }}
-                            slotProps={{
-                                input: {
-                                    startAdornment: <InputAdornment position="start"><ImageIcon /></InputAdornment>,
-                                },
-                            }}
-                            variant="outlined"
-                        />
-                    </FormControl>
+
                     <Box sx={{ display: 'flex' }}>
-                        <Button sx={{ width: '200px', marginRight: '58px', marginLeft: '8px' }} variant="contained">Kayit Ol</Button>
+                        <Button onClick={handleRegister} sx={{ width: '200px', marginRight: '58px', marginLeft: '8px' }} variant="contained">Kayit Ol</Button>
                         <Button color='success' sx={{ width: '200px' }} variant="contained">Giris Yap</Button>
                     </Box>
 

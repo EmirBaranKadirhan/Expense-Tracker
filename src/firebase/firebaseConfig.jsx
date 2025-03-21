@@ -1,5 +1,7 @@
 import { initializeApp } from "firebase/app";
 import { getFirestore } from 'firebase/firestore';      //  Cloud Firestore'ı içe aktardik
+import { getAuth } from 'firebase/auth'
+import { getStorage } from 'firebase/storage';
 
 const firebaseConfig = {
     apiKey: "AIzaSyCdgJP8kzJ-LXBPIJVhMjjv7B7dcio_pg8",
@@ -16,4 +18,8 @@ const app = initializeApp(firebaseConfig);
 // Firestore veritabanına bağlantıyı oluştur
 export const db = getFirestore(app);
 
+// Firebase authentication baslat
+export const auth = getAuth(app);
+
+export const storage = getStorage(app);
 

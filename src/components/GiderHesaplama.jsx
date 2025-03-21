@@ -10,7 +10,7 @@ import MenuItem from '@mui/material/MenuItem';
 import Button from '@mui/material/Button';
 import { useDispatch, useSelector } from 'react-redux';
 import { addExpenses, sendExpensesToFirestore } from '../redux/slices/transactionsSlice'
-
+import { auth } from '../firebase/firebaseConfig'
 
 const currencies = [
     {
@@ -47,9 +47,11 @@ function GiderHesaplama() {
 
     const handleSubmit = () => {
         if (amount) {
+            const userId = auth.currentUser.uid;
+            console.log(userId)
             const expensesData = { type: "Gider", amount, category, description, date: new Date().toLocaleDateString('tr-TR') }
             dispatch(addExpenses(expensesData));
-            dispatch(sendExpensesToFirestore(expensesData));
+            dispatch(sendExpensesToFirestore({ userId, expensesData }));
             setAmount("");
             setCategory("");
             setDescription("");

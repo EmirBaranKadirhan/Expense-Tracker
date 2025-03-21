@@ -10,7 +10,7 @@ import MenuItem from '@mui/material/MenuItem';
 import Button from '@mui/material/Button';
 import { useDispatch, useSelector } from 'react-redux'
 import { addIncomes, sendToFirestore } from '../redux/slices/transactionsSlice'
-
+import { auth } from '../firebase/firebaseConfig'
 
 
 const currencies = [
@@ -41,9 +41,10 @@ function GelirHesaplama() {
 
     const handleSubmit = () => {
         if (amount) {
+            const userId = auth.currentUser.uid;    // auth.currentUser => su anda oturum acmis olan kullanciyi temsil eder
             const income = { type: "Gelir", amount, category, description, date: new Date().toLocaleDateString('tr-TR') };
             dispatch(addIncomes(income));
-            dispatch(sendToFirestore(income));
+            dispatch(sendToFirestore({ userId, income }));
             setAmount("");
             setCategory("");
             setDescription("");
