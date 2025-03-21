@@ -18,7 +18,7 @@ export const sendToFirestore = createAsyncThunk('incomes', async ({ userId, inco
 export const sendExpensesToFirestore = createAsyncThunk('expenses', async ({ userId, expensesData }) => {
     try {
         const userDocRef = doc(db, "users", userId);      // "users" koleksiyonundaki userId'ye sahip belgeyi hedef aliyoruz ki o belge uzerinde islem yapabilelim ya da referans olusturabilelim o belgeye
-        const expensesCollectionRef = collection(userDocRef, "expense")     // belirli bir "kullanıcı belgesi" altında yer alan "expense alt koleksiyonunu" hedef aliriz ve bu koleksiyonda duzenleme ayrica referans olusturabiliriz  
+        const expensesCollectionRef = collection(userDocRef, "expenses")     // belirli bir "kullanıcı belgesi" altında yer alan "expense alt koleksiyonunu" hedef aliriz ve bu koleksiyonda duzenleme ayrica referans olusturabiliriz  
         const docRef = await addDoc(expensesCollectionRef, expensesData);       // yukaridaki "expensesData" parametresi addDoc'a parametre olarak gecer ve firestore'a eklenir. 
         return docRef.id;
     } catch (error) {

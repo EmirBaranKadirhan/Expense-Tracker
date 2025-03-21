@@ -2,14 +2,14 @@ import React, { useEffect, useState } from 'react'
 import { DataGrid, GridToolbar } from '@mui/x-data-grid';
 import Box from '@mui/material/Box';
 import { collection, getDocs, doc, updateDoc, getDoc, deleteDoc } from 'firebase/firestore';
-import { db } from '../firebase/firebaseConfig'
+import { db, auth } from '../firebase/firebaseConfig'
 import Snackbar from '@mui/material/Snackbar';
 import Alert from '@mui/material/Alert';
 import { MdDelete } from "react-icons/md";
 import { IconButton } from '@mui/material';
 import { useDispatch } from 'react-redux';
 import { deleteFromFirebase } from '../redux/slices/transactionsSlice'
-
+import { useAuthState } from 'react-firebase-hooks/auth';
 
 function TableOfIncomesAndExpenses() {
 
@@ -51,6 +51,8 @@ function TableOfIncomesAndExpenses() {
     const [snackbar, setSnackbar] = React.useState(null);
     const handleCloseSnackbar = () => setSnackbar(null);
 
+    const [user] = useAuthState(auth);      // useAuthState ==> bu hook, oturum açmış olan kullanıcının durumunu izler. Kullanici oturum acip,kapattiginda veya oturum durumu degistiginde bu hook otomatik guncellenir
+
     const dispatch = useDispatch();
 
     const handleDelete = async (id) => {
@@ -61,30 +63,42 @@ function TableOfIncomesAndExpenses() {
 
             setSnackbar({ children: 'Row successfully deleted', severity: 'success' })
         } catch (error) {
-
+            console.error("Error deleting document:", error);
         }
     }
 
     useEffect(() => {
         const fetchData = async () => {
-            const querySnapshot = await getDocs(collection(db, 'transactions'));    // firestore'dan bilgileri cektik, koleksiyon adini verdik "transaction"
-            const dataList = querySnapshot.docs.map(doc => ({
-                id: doc.id, ...doc.data()   // firestore'dan gelen veriler 
-            }))
-            console.log("Firestore'dan gelen veriler:", dataList);
-            setData(dataList)
+            if (user) {
+                const incomesRef = collection(db, 'users', user.uid, 'incomes');
+                const expensesRef = collection(db, 'users', user.uid, 'expenses');
+
+                const incomesSnapshot = await getDocs(incomesRef);     // firestore'dan bilgileri cektik
+                const expensesSnapshot = await getDocs(expensesRef);
+
+                const incomesData = incomesSnapshot.docs.map(doc => ({
+                    id: doc.id, ...doc.data(), type: 'Gelir'
+                }));
+
+                const expensesData = expensesSnapshot.docs.map(doc => ({
+                    id: doc.id, ...doc.data(), type: 'Gider'
+                }));
+
+                setData([...incomesData, ...expensesData]);
+            }
 
         }
 
         fetchData();
-    }, [])
+    }, [user])
 
     // satir guncellendiginde calisacak kisim
     const handleProcessRowUpdate = async (newRow, oldRow) => {      // yandaki callback fonksiyon 2 parametre aliyor, ilki guncellenmis deger ikincisi de orjinal degeri. Amaci ise sonrasinda verileri karsilastirmamiza yarar 
         try {
             console.log("Güncellenen veri:", newRow);
 
-            const docRef = doc(db, 'transactions', newRow.id);      // doc ==> ile belirli bir koleksiyon icindeki belli bir dokumani hedef aliriz.
+            const collectionName = newRow.type === 'Gelir' ? 'incomes' : 'expenses';
+            const docRef = doc(db, 'users', user.uid, collectionName, newRow.id);      // doc ==> ile belirli bir koleksiyon icindeki belli bir dokumani hedef aliriz.
 
             // Firestore'da böyle bir belgenin kontrolunu yapariz
             const docSnap = await getDoc(docRef);                   // getDoc ==> Firestore'da belirli bir belgeyi (document) almak için kullaniriz.

@@ -23,16 +23,15 @@ function Login() {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [username, setUsername] = useState('');
-    const [profileImage, setProfileImage] = useState(null);
+
 
 
     const handleRegister = async () => {
         try {
-            const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+            const userCredential = await createUserWithEmailAndPassword(auth, email, password);     // firebase Authentication ile kayit
             const user = userCredential.user;
 
-
-
+            // kullanici bilgilerini firestore'a kaydet
             await setDoc(doc(db, "users", user.uid), {
                 username: username,
                 email: email,
