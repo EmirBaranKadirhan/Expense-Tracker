@@ -9,13 +9,15 @@ import TrendingDownIcon from '@mui/icons-material/TrendingDown';
 import { auth, db } from '../firebase/firebaseConfig'
 import { useAuthState } from 'react-firebase-hooks/auth';
 import { collection, getDocs, getDoc, doc } from 'firebase/firestore';
+import Alert from '@mui/material/Alert';
+
 
 function Home() {
 
     const [userInfo, setUserInfo] = useState({});
     const [incomes, setIncomes] = useState([]);
     const [expenses, setExpenses] = useState([]);
-
+    const [assets, setAssests] = useState()
 
     const [user] = useAuthState(auth);
 
@@ -59,12 +61,15 @@ function Home() {
     const totalExpenses = expenses.reduce((acc, expense) => {
         return acc + expense.amount;
     }, 0)
-
     console.log(totalExpenses)
+
+    const totalAssets = totalIncomes - totalExpenses
+    console.log(totalAssets)
+
     return (
         <div style={{ marginTop: '100px', display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh' }}>
-            <Card sx={{ display: 'flex', width: '800px', height: '500px' }}>
-                <Box>
+            <Card sx={{ display: 'flex', width: '700px', height: '500px', alignItems: 'center' }}>
+                <Box sx={{ flex: 1, display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'flex-start', padding: 3 }}>
                     <CardContent>
                         <Typography component="div" variant="h5">
                             {username}
@@ -78,6 +83,10 @@ function Home() {
                         <Typography>
                             <TrendingDownIcon /> Gider Miktari: {totalExpenses}
                         </Typography>
+                        <Alert severity={totalAssets < 0 ? 'error' : 'success'}>
+                            {totalAssets < 0 ? 'Zarar Ediyorsunuz' : 'Kârdasınız'}
+                        </Alert>
+
                     </CardContent>
                 </Box>
                 <CardMedia
