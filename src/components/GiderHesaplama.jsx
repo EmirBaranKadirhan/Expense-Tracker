@@ -49,7 +49,7 @@ function GiderHesaplama() {
         if (amount) {
             const userId = auth.currentUser.uid;
             console.log(userId)
-            const expensesData = { type: "Gider", amount, category, description, date: new Date().toLocaleDateString('tr-TR') }
+            const expensesData = { type: "Gider", amount: Number(amount), category, description, date: new Date().toLocaleDateString('tr-TR') }
             dispatch(addExpenses(expensesData));
             dispatch(sendExpensesToFirestore({ userId, expensesData }));
             setAmount("");

@@ -2,35 +2,41 @@ import React, { useEffect, useState } from 'react'
 import { PieChart } from '@mui/x-charts/PieChart';
 import { db } from '../firebase/firebaseConfig'
 import { collection, getDocs } from 'firebase/firestore';
-
+import { auth } from '../firebase/firebaseConfig'
+import { useAuthState } from 'react-firebase-hooks/auth';
 
 function BalanceChart() {
 
 
     const [incomesData, setIncomesData] = useState([])
     const [expensesData, setExpensesData] = useState([])
+    const [user] = useAuthState(auth);
 
     useEffect(() => {
         const getDataFromFirebase = async () => {
-            try {
-                const querySnapshot = await getDocs(collection(db, 'transactions'))
-                // console.log(querySnapshot.docs)
-                const data = querySnapshot.docs.map((doc) => doc.data());
-                console.log(data)
+            if (user) {
+                try {
+                    const incomesSnapshot = await getDocs(collection(db, 'users', user.uid, 'incomes'))
+                    // console.log(querySnapshot.docs)
+                    const incomesData = incomesSnapshot.docs.map((doc) => doc.data());
+                    console.log(incomesData)
 
-                const incomes = data.filter((item) => item.type === 'Gelir');
-                const expenses = data.filter((item) => item.type === 'Gider');
+                    const expensesSnapshot = await getDocs(collection(db, 'users', user.uid, 'expenses'))
+                    const expensesData = expensesSnapshot.docs.map((doc) => doc.data());
+                    console.log(expensesData)
 
-                // kategorilere gore gruplama ve toplama
-                const groupedIncomes = groupAndSumByCategory(incomes);
-                console.log(groupedIncomes)
-                const groupedExpenses = groupAndSumByCategory(expenses);
 
-                setIncomesData(groupedIncomes);
-                setExpensesData(groupedExpenses);
+                    // kategorilere gore gruplama ve toplama
+                    const groupedIncomes = groupAndSumByCategory(incomesData);
+                    console.log(groupedIncomes)
+                    const groupedExpenses = groupAndSumByCategory(expensesData);
 
-            } catch (error) {
-                console.log(`Error fetching data`, error)
+                    setIncomesData(groupedIncomes);
+                    setExpensesData(groupedExpenses);
+
+                } catch (error) {
+                    console.log(`Error fetching data`, error)
+                }
             }
 
         }
