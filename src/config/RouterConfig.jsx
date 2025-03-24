@@ -5,6 +5,7 @@ import GelirGiderEkle from '../pages/GelirGiderEkle'
 import IncomesAndExpenses from '../pages/IncomesAndExpenses'
 import BalanceChart from '../pages/BalanceChart'
 import Login from '../pages/Login'
+import ProfileEdit from '../components/ProfileEdit'
 
 function RouterConfig() {
     return (
@@ -16,6 +17,7 @@ function RouterConfig() {
                 <Route path='/incomesAndExpenses' element={<IncomesAndExpenses />} />
                 <Route path='/balanceChart' element={<BalanceChart />} />
                 <Route path='/login' element={<Login />} />
+                <Route path='/profileEdit' element={<ProfileEdit />} />
             </Routes>
         </div>
     )
