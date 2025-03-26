@@ -1,8 +1,7 @@
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import Box from '@mui/material/Box';
 import FormControl from '@mui/material/FormControl';
 import InputLabel from '@mui/material/InputLabel';
-import OutlinedInput from '@mui/material/OutlinedInput';
 import InputAdornment from '@mui/material/InputAdornment';
 import TextField from '@mui/material/TextField';
 import FilledInput from '@mui/material/FilledInput';
@@ -10,13 +9,13 @@ import MenuItem from '@mui/material/MenuItem';
 import Button from '@mui/material/Button';
 import { useDispatch, useSelector } from 'react-redux'
 import { addIncomes, sendToFirestore } from '../redux/slices/transactionsSlice'
-import { auth } from '../firebase/firebaseConfig'
+import { db, auth } from '../firebase/firebaseConfig'
 import DialogTitle from '@mui/material/DialogTitle';
 import Dialog from '@mui/material/Dialog';
 import DialogContent from '@mui/material/DialogContent';
 import DialogActions from '@mui/material/DialogActions';
-
-
+import { arrayUnion, doc, getDoc, updateDoc } from "firebase/firestore";
+import { onAuthStateChanged } from "firebase/auth";
 
 function GelirHesaplama() {
 
@@ -59,8 +58,8 @@ function GelirHesaplama() {
         }
     }
 
-    const handleAddCategory = () => {
-        if (newCategory.trim() !== '') {
+    const handleAddCategory = async () => {
+        if (newCategory !== '') {
             const formattedCategory = {
                 value: newCategory,
                 label: newCategory
@@ -70,8 +69,59 @@ function GelirHesaplama() {
             setOpenDialog(false);
 
         }
+        // yeni eklenen kategorinin firestore'a kaydedilmesi
+        try {
+            const userId = auth.currentUser.uid;
+            const docRef = doc(db, 'users', userId);
+
+            await updateDoc(docRef, {       // updateDoc ==> hedef dokumanin(docRef) "categories" alanini gunceller
+                incomeCategories: arrayUnion(newCategory)     // arrayUnion ==> Firestore'daki bir dizinin icine yeni bir eleman eklemek icin kullanılır. Ayni elemandan varsa da bunu tekrar eklemez !
+            })
+
+            console.log("Income Category added to Firestore");
+        } catch (error) {
+            console.error("Error adding category to Firestore: ", error);
+        }
     }
 
+    useEffect(() => {
+        const unsubscribe = onAuthStateChanged(auth, (user) => {    // onAuthStateChanged ==> Firebase Authentication'da oturum açma durumunu izlemek için kullanılır. 
+            // Bu fonksiyona iki parametre gecilir birisi "auth" digeri de callback() fonksiyon. Callback oturum acmis kullaniciyi temsil eden ("user") nesnesi alir
+
+            if (user) {
+                const fetchCategories = async () => {
+                    try {
+                        const userId = user.uid;
+                        const docRef = doc(db, 'users', userId);
+                        const docSnap = await getDoc(docRef);
+
+                        if (docSnap.exists()) {     // exists ==> dokuman varsa true yoksa false doner
+                            const userData = docSnap.data();
+                            console.log(userData);
+
+                            const firestoreIncomeCategories = userData.incomeCategories || [];
+                            setCategories((prevCategories) => [         //  prevCategories ==> state icindeki ilk degerleri aldik ve sonra yeni gelen degerleri spread ile ekleyip guncelledik
+                                ...prevCategories,
+                                ...firestoreIncomeCategories.map(item => ({ value: item, label: item }))
+                            ]);
+                        }
+                    } catch (error) {
+                        console.log("Error fetching categories:", error);
+                    }
+                };
+
+                fetchCategories();
+            } else {
+                console.log("User is not logged in.");
+            }
+        });
+
+        return () => unsubscribe();         // gereksiz islemleri durdurmak icin kullanilir 
+    }, []);
+
+    useEffect(() => {
+        console.log("Current categories: ", categories);
+    }, [categories]);       // categories state'i her degistiginde useEffect calisacak
 
     return (
         <div>
