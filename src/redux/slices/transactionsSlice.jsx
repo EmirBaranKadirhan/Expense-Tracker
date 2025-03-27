@@ -27,10 +27,12 @@ export const sendExpensesToFirestore = createAsyncThunk('expenses', async ({ use
 })
 
 
-export const deleteFromFirebase = createAsyncThunk('transactions', async (id) => {      //  fonksiyon icindeki ilk parametre adlandirmasini biz istedigimiz gibi verebilirz !! 
+export const deleteFromFirebase = createAsyncThunk('deleteTransaction', async ({ userId, collectionName, transactionId }) => {      //  fonksiyon icindeki ilk parametre adlandirmasini biz istedigimiz gibi verebilirz !! 
     try {
-        await deleteDoc(doc(db, 'transactions', id));
-        return id;                  // asagida payload durumunda kullanilacak id buradan gelir
+        const userDocRef = doc(db, 'users', userId);
+        const collectionRef = collection(userDocRef, collectionName);
+        await deleteDoc(doc(collectionRef, transactionId));
+        return { collectionName, transactionId };                  // asagida payload durumunda kullanilacak id buradan gelir
     } catch (error) {
         console.log(error.message);
 
@@ -66,9 +68,13 @@ export const transactionsSlice = createSlice({
         })
 
         builder.addCase(deleteFromFirebase.fulfilled, (state, action) => {
-            console.log(`Document with ID: ${action.payload}`);
-            state.incomes = state.incomes.filter((income) => income.id !== action.payload);
-            state.expenses = state.expenses.filter((expense) => expense.id !== action.payload);
+            const { collectionName, transactionId } = action.payload;
+            console.log(`Document with ID: ${transactionId} deleted from ${collectionName}`);
+            if (collectionName === 'incomes') {
+                state.incomes = state.incomes.filter((income) => income.id !== transactionId);
+            } else if (collectionName === 'expenses') {
+                state.expenses = state.expenses.filter((expense) => expense.id !== transactionId);
+            }
         })
     }
 })

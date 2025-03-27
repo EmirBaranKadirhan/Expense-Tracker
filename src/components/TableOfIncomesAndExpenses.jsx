@@ -56,12 +56,20 @@ function TableOfIncomesAndExpenses() {
     const dispatch = useDispatch();
 
     const handleDelete = async (id) => {
+        if (!user) return;
+
         try {
+            const itemToDelete = data.find((item) => item.id === id);
+            if (!itemToDelete) {
+                console.log("Silinecek veri bulunamadi")
+                return
+            }
 
-            await dispatch(deleteFromFirebase(id)).unwrap();
+            const collectionName = itemToDelete.type === "Gelir" ? "incomes" : "expenses";
+            await dispatch(deleteFromFirebase({ userId: user.uid, collectionName, transactionId: id })).unwrap();
+
             setData((currentData) => currentData.filter((row) => row.id !== id));
-
-            setSnackbar({ children: 'Row successfully deleted', severity: 'success' })
+            setSnackbar({ children: "Row successfully deleted", severity: "success" });
         } catch (error) {
             console.error("Error deleting document:", error);
         }
